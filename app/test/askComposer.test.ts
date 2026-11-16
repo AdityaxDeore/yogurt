@@ -87,3 +87,14 @@ it('disables the composer and says Ask is off when transcription only is on', ()
   expect(idleHtml).toMatch(/data-testid="chat-send"[^>]*disabled=""/)
   expect(idleHtml).toContain('Ask is off in Transcription only mode.')
 })
+
+it('keeps the landing input labeled without repeating its heading as a placeholder', () => {
+  vi.stubGlobal('window', { matchMedia: () => ({ matches: false }) })
+  const initial: ConversationView = { id: 'landing-copy', title: '', chips: [], draft: '', draftChips: [], firstChips: null,
+    turns: [], waitsForMeeting: false, waitsForModel: false }
+  const html = renderToStaticMarkup(createElement(AskConversation, { id: initial.id, initial, home: true, onSelect() {}, onDeleted() {}, onSource() {} }))
+  expect(html).toContain('class="ask-home-title">Ask about your meetings</h1>')
+  const input = html.match(/<textarea[^>]*>/)?.[0]
+  expect(input).toContain('aria-label="Ask about your meetings"')
+  expect(input).not.toContain('placeholder=')
+})
