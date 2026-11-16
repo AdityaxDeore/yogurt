@@ -702,5 +702,7 @@
   "Clear": "Șterge",
   "Reading {title} {others}…": "Se citesc „{title}” {others}…",
   "Searched {name}": "Căutat în {name}",
-  "Searched all meetings": "Căutat în toate întâlnirile"
+  "Searched all meetings": "Căutat în toate întâlnirile",
+  "Show Yogurt in the Dock": "Afișează Yogurt în Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "Pictograma Dock rămâne vizibilă cât timp pictograma barei de meniu este dezactivată."
 }

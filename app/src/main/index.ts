@@ -18,7 +18,7 @@ import { basename, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { isFake, userDataDir } from './paths'
 import { logToFile } from './log'
-import { loadSettings, localeOf, keepsRecording, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
+import { loadSettings, localeOf, keepsRecording, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings, visibilityOf } from './settings'
 import { CALL_GONE_MS, useCallApps } from './detect'
 import { systemLocale } from './locale'
 import { language as uiLanguage, onLanguage, setLanguage, t } from '../shared/i18n'
@@ -102,6 +102,9 @@ let allowQuit = false
 let presentMain = (_foreground = false) => {}
 let updateMainMenu = () => {}
 let setTrayVisible = (_on: boolean) => {}
+let setDockVisible = (_on: boolean) => {}
+/** the Dock icon's last applied state, so a repeated call never re-hides or re-shows it */
+let dockVisible: boolean | undefined
 /** whether the tray icon is there to reopen Yogurt from (Windows and Linux minimise on close without it) */
 let trayShown = () => true
 /** test runs: no window on screen, never takes focus from what the person is doing */
@@ -456,6 +459,18 @@ app.whenReady().then(() => {
   // Local Electron launches need the same Dock icon as the packaged application.
   if (!app.isPackaged && process.platform === 'darwin') app.dock?.setIcon(join(__dirname, '../../build/icon.png'))
   const settings = loadSettings(join(userDataDir(), 'settings.json'))
+  // the Dock icon: a Mac only, and never a repeated native call for the same state
+  setDockVisible = (on) => {
+    if (process.platform !== 'darwin') return
+    if (dockVisible === on) return
+    dockVisible = on
+    if (on) void app.dock?.show()
+    else app.dock?.hide()
+  }
+  // a settings file edited by hand can leave no visible entry point: heal it before the window shows
+  const visible = visibilityOf(settings)
+  if (visible.showInDock && settings.showInDock === false) updateSettings(join(userDataDir(), 'settings.json'), { showInDock: undefined })
+  setDockVisible(visible.showInDock)
   // the theme picked in Settings; the system's when none
   nativeTheme.themeSource = settings.theme ?? 'system'
   setLanguage(localeOf(settings, systemLocale()))
@@ -473,6 +488,7 @@ app.whenReady().then(() => {
     ask: !isFake() || !!process.env.YOGURT_FAKE_PERMISSIONS,
     setLogin: (on) => { if (!isFake()) setLoginItem(on) },
     setTrayVisible: (on) => setTrayVisible(on),
+    setDockVisible: (on) => setDockVisible(on),
     loginOn: (saved) => (isFake() ? !!saved : loginItemOn(saved)),
     macName,
     // never mid-meeting: quitting would end the recording

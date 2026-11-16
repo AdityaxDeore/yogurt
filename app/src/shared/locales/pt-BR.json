@@ -701,5 +701,7 @@
   "Clear": "Limpar",
   "Reading {title} {others}…": "Lendo {title} {others}…",
   "Searched {name}": "Pesquisa em {name}",
-  "Searched all meetings": "Pesquisa em todas as reuniões"
+  "Searched all meetings": "Pesquisa em todas as reuniões",
+  "Show Yogurt in the Dock": "Mostrar Yogurt no Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "O ícone do Dock continua visível enquanto o ícone da barra de menus estiver desativado."
 }

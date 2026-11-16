@@ -643,5 +643,7 @@
   "Clear": "清除",
   "Reading {title} {others}…": "正在讀取「{title}」{others}…",
   "Searched {name}": "已搜尋{name}",
-  "Searched all meetings": "已搜尋所有會議"
+  "Searched all meetings": "已搜尋所有會議",
+  "Show Yogurt in the Dock": "在 Dock 中顯示 Yogurt",
+  "The Dock icon stays visible while the menu bar icon is off.": "選單列圖示關閉時，Dock 圖示將保持可見。"
 }

@@ -685,5 +685,7 @@
   "Clear": "Tøm",
   "Reading {title} {others}…": "Leser {title} {others}…",
   "Searched {name}": "Søkte i {name}",
-  "Searched all meetings": "Søkte i alle møter"
+  "Searched all meetings": "Søkte i alle møter",
+  "Show Yogurt in the Dock": "Vis Yogurt i Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "Dock-ikonet forblir synlig mens menylinjeikonet er slått av."
 }

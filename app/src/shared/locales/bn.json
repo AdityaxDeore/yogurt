@@ -673,5 +673,7 @@
   "Clear": "মুছুন",
   "Reading {title} {others}…": "{title} {others} পড়া হচ্ছে…",
   "Searched {name}": "{name}-এ খোঁজা হয়েছে",
-  "Searched all meetings": "সব মিটিংয়ে খোঁজা হয়েছে"
+  "Searched all meetings": "সব মিটিংয়ে খোঁজা হয়েছে",
+  "Show Yogurt in the Dock": "Dock-এ Yogurt দেখান",
+  "The Dock icon stays visible while the menu bar icon is off.": "মেনু বার আইকন বন্ধ থাকলে Dock আইকন দৃশ্যমান থাকে।"
 }

@@ -16,6 +16,8 @@ export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what t
   openAtLogin?: boolean
   /** the native menu bar icon; on unless turned off */
   showInMenuBar?: boolean
+  /** the Dock icon; on unless turned off */
+  showInDock?: boolean
   /** Legacy flag, ignored: it may have come from a different app bundle. Removed after a confirmed post. */
   notificationsAsked?: boolean
   /** Designated requirements of app identities that successfully posted the registering notification. Not authorization. */
@@ -56,6 +58,15 @@ export const keepsRecording = (s: Settings, endedAt: number | null): boolean =>
   s.keepRecordings !== false || typeof s.recordingsOffAt !== 'number' || !Number.isFinite(s.recordingsOffAt) || endedAt == null || endedAt <= s.recordingsOffAt
 
 export const autoUpdateOn = (s: Settings): boolean => s.autoUpdate !== false
+
+/** The Dock icon and the menu bar icon, as the person sees them: at least one stays visible, so the app always has an entry point. */
+export type Visibility = { showInMenuBar: boolean; showInDock: boolean }
+/** The same rule for two plain values: the Dock comes back when the menu bar is off. */
+export function normalizeVisibility(menuBar: boolean, dock: boolean): Visibility {
+  return menuBar ? { showInMenuBar: true, showInDock: dock } : { showInMenuBar: false, showInDock: true }
+}
+/** The visibility the saved settings actually give, with a no-entry-point file healed. */
+export const visibilityOf = (s: Settings): Visibility => normalizeVisibility(s.showInMenuBar !== false, s.showInDock !== false)
 
 export function loadSettings(path: string): Settings {
   try { return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : {} } catch { return {} }

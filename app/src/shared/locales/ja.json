@@ -643,5 +643,7 @@
   "Clear": "クリア",
   "Reading {title} {others}…": "「{title}」{others}を読んでいます…",
   "Searched {name}": "{name}を検索",
-  "Searched all meetings": "すべての会議を検索"
+  "Searched all meetings": "すべての会議を検索",
+  "Show Yogurt in the Dock": "DockにYogurtを表示",
+  "The Dock icon stays visible while the menu bar icon is off.": "メニューバーアイコンがオフの間は、Dockアイコンが表示されたままになります。"
 }

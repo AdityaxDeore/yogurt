@@ -688,5 +688,7 @@
   "Clear": "Εκκαθάριση",
   "Reading {title} {others}…": "Ανάγνωση {title} {others}…",
   "Searched {name}": "Αναζήτηση στο {name}",
-  "Searched all meetings": "Αναζήτηση σε όλες τις συναντήσεις"
+  "Searched all meetings": "Αναζήτηση σε όλες τις συναντήσεις",
+  "Show Yogurt in the Dock": "Εμφάνιση του Yogurt στο Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "Το εικονίδιο του Dock παραμένει ορατό όσο το εικονίδιο της γραμμής μενού είναι απενεργοποιημένο."
 }

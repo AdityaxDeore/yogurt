@@ -704,5 +704,7 @@
   "Clear": "Cancella",
   "Reading {title} {others}…": "Lettura di «{title}» {others}…",
   "Searched {name}": "Ricerca in {name}",
-  "Searched all meetings": "Ricerca in tutte le riunioni"
+  "Searched all meetings": "Ricerca in tutte le riunioni",
+  "Show Yogurt in the Dock": "Mostra Yogurt nel Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "L’icona del Dock resta visibile finché l’icona della barra dei menu è disattivata."
 }

@@ -685,5 +685,7 @@
   "Clear": "I-clear",
   "Reading {title} {others}…": "Binabasa ang {title} {others}…",
   "Searched {name}": "Hinanap sa {name}",
-  "Searched all meetings": "Hinanap sa lahat ng pulong"
+  "Searched all meetings": "Hinanap sa lahat ng pulong",
+  "Show Yogurt in the Dock": "Ipakita ang Yogurt sa Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "Mananatiling nakikita ang icon ng Dock habang naka-off ang icon ng menu bar."
 }

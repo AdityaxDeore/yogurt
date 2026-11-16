@@ -5,7 +5,7 @@ import type { Access, McpStatus, PermissionKind, PermissionStatus, SetupState, T
 import { notesDownloadText, notesUpgradeSize } from '../notesSetup'
 import { permissionCopy } from '../permissionCopy'
 import { LOCALES, t } from '../../../shared/i18n'
-import { osWords } from '../keys'
+import { onMac, osWords } from '../keys'
 import { applyLanguage } from '../i18n'
 import { flushOpenNotes } from '../noteAutosave'
 import { Jargon } from '../components/Jargon'
@@ -25,7 +25,7 @@ const trayLabel = () => osWords({ mac: t('Show Yogurt in the menu bar'), windows
 /** focus: the setting a toast's Settings button opens, recordings or notes-model */
 export function Settings({ revision = 0, focus }: { revision?: number; focus?: string }) {
   const [perms, setPerms] = useState<PermissionStatus>()
-  const [prefs, setPrefs] = useState<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; myName: string; macName: string; stopWhenCallEnds: boolean; recordingReminder: boolean; keepRecordings: boolean }>()
+  const [prefs, setPrefs] = useState<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; showInDock: boolean; myName: string; macName: string; stopWhenCallEnds: boolean; recordingReminder: boolean; keepRecordings: boolean }>()
   const [name, setName] = useState('')
   const [generalReady, setGeneralReady] = useState(false)
   const scroll = useScrollMemory<HTMLDivElement>('settings', !!prefs && !!perms)
@@ -56,6 +56,17 @@ export function Settings({ revision = 0, focus }: { revision?: number; focus?: s
     if (!prefs) return
     const on = !prefs.stopWhenCallEnds
     setPrefs({ ...prefs, stopWhenCallEnds: on }); void window.yogurt.settings.setStopWhenCallEnds(on)
+  }
+  const menuBar = () => {
+    if (!prefs) return
+    const on = !prefs.showInMenuBar
+    // turning the menu bar off while the Dock is hidden brings the Dock back: show it at once, no reload wait
+    setPrefs({ ...prefs, showInMenuBar: on, showInDock: !on && !prefs.showInDock ? true : prefs.showInDock }); void window.yogurt.settings.setShowInMenuBar(on)
+  }
+  const dock = () => {
+    if (!prefs) return
+    const on = !prefs.showInDock
+    setPrefs({ ...prefs, showInDock: on }); void window.yogurt.settings.setShowInDock(on)
   }
 
   return (
@@ -99,10 +110,18 @@ export function Settings({ revision = 0, focus }: { revision?: number; focus?: s
             </div>
             <div className="settings-row">
               <p className="settings-label settings-row-copy">{trayLabel()}</p>
-              <button data-testid="menu-bar-toggle" role="switch" aria-checked={!!prefs?.showInMenuBar} aria-label={trayLabel()}
-                onClick={() => { if (!prefs) return; const on = !prefs.showInMenuBar; setPrefs({ ...prefs, showInMenuBar: on }); void window.yogurt.settings.setShowInMenuBar(on) }}
+              <button data-testid="menu-bar-toggle" role="switch" aria-checked={!!prefs?.showInMenuBar} aria-label={trayLabel()} onClick={menuBar}
                 className="settings-toggle"><span className="settings-toggle-knob" /></button>
             </div>
+            {onMac() && <div className="settings-row">
+              <div className="settings-row-copy">
+                <p className="settings-label">{t('Show Yogurt in the Dock')}</p>
+                {prefs && !prefs.showInMenuBar && <p className="settings-description">{t('The Dock icon stays visible while the menu bar icon is off.')}</p>}
+              </div>
+              <button data-testid="dock-toggle" role="switch" aria-checked={!!prefs?.showInDock} aria-label={t('Show Yogurt in the Dock')}
+                disabled={!prefs || !prefs.showInMenuBar} onClick={dock}
+                className="settings-toggle"><span className="settings-toggle-knob" /></button>
+            </div>}
             <div className="settings-row">
               <div className="settings-row-copy">
                 <p className="settings-label">{t('Finish recording when the call ends')}</p>

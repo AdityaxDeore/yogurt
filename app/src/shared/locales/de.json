@@ -685,5 +685,7 @@
   "Clear": "Zurücksetzen",
   "Reading {title} {others}…": "„{title}“ {others} werden gelesen …",
   "Searched {name}": "{name} durchsucht",
-  "Searched all meetings": "Alle Besprechungen durchsucht"
+  "Searched all meetings": "Alle Besprechungen durchsucht",
+  "Show Yogurt in the Dock": "Yogurt im Dock anzeigen",
+  "The Dock icon stays visible while the menu bar icon is off.": "Das Dock-Symbol bleibt sichtbar, solange das Menüleisten-Symbol ausgeschaltet ist."
 }

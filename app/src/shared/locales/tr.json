@@ -673,5 +673,7 @@
   "Clear": "Temizle",
   "Reading {title} {others}…": "“{title}” {others} okunuyor…",
   "Searched {name}": "{name} içinde arandı",
-  "Searched all meetings": "Tüm toplantılarda arandı"
+  "Searched all meetings": "Tüm toplantılarda arandı",
+  "Show Yogurt in the Dock": "Yogurt’u Dock’ta göster",
+  "The Dock icon stays visible while the menu bar icon is off.": "Menü çubuğu simgesi kapalıyken Dock simgesi görünür kalır."
 }

@@ -713,5 +713,7 @@
   "Clear": "Очистити",
   "Reading {title} {others}…": "Читаємо «{title}» {others}…",
   "Searched {name}": "Пошук у {name}",
-  "Searched all meetings": "Пошук у всіх зустрічах"
+  "Searched all meetings": "Пошук у всіх зустрічах",
+  "Show Yogurt in the Dock": "Показувати Yogurt у Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "Піктограма Dock залишиться видимою, доки піктограма рядка меню вимкнена."
 }

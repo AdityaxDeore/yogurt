@@ -721,5 +721,7 @@
   "Clear": "Wyczyść",
   "Reading {title} {others}…": "Czytanie spotkań „{title}” {others}…",
   "Searched {name}": "Przeszukano {name}",
-  "Searched all meetings": "Przeszukano wszystkie spotkania"
+  "Searched all meetings": "Przeszukano wszystkie spotkania",
+  "Show Yogurt in the Dock": "Pokazuj Yogurt w Docku",
+  "The Dock icon stays visible while the menu bar icon is off.": "Ikona Docka pozostaje widoczna, gdy ikona paska menu jest wyłączona."
 }

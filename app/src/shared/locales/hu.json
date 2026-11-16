@@ -673,5 +673,7 @@
   "Clear": "Törlés",
   "Reading {title} {others}…": "„{title}” {others} olvasása…",
   "Searched {name}": "{name} átvizsgálva",
-  "Searched all meetings": "Összes megbeszélés átvizsgálva"
+  "Searched all meetings": "Összes megbeszélés átvizsgálva",
+  "Show Yogurt in the Dock": "Yogurt megjelenítése a Dockban",
+  "The Dock icon stays visible while the menu bar icon is off.": "A Dock ikonja látható marad, amíg a menüsáv ikonja ki van kapcsolva."
 }

@@ -685,5 +685,7 @@
   "Clear": "Rensa",
   "Reading {title} {others}…": "Läser {title} {others}…",
   "Searched {name}": "Sökte i {name}",
-  "Searched all meetings": "Sökte i alla möten"
+  "Searched all meetings": "Sökte i alla möten",
+  "Show Yogurt in the Dock": "Visa Yogurt i Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "Dock-ikonen förblir synlig medan menyradsikonen är avstängd."
 }

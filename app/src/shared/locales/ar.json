@@ -741,5 +741,7 @@
   "Clear": "مسح",
   "Reading {title} {others}…": "جارٍ قراءة {title} {others}…",
   "Searched {name}": "تم البحث في {name}",
-  "Searched all meetings": "تم البحث في كل الاجتماعات"
+  "Searched all meetings": "تم البحث في كل الاجتماعات",
+  "Show Yogurt in the Dock": "إظهار Yogurt في Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "تظل أيقونة Dock ظاهرة بينما أيقونة شريط القوائم مغلقة."
 }

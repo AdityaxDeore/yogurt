@@ -685,5 +685,7 @@
   "Clear": "Wissen",
   "Reading {title} {others}…": "{title} {others} lezen…",
   "Searched {name}": "Gezocht in {name}",
-  "Searched all meetings": "Gezocht in alle vergaderingen"
+  "Searched all meetings": "Gezocht in alle vergaderingen",
+  "Show Yogurt in the Dock": "Toon Yogurt in het Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "Het Dock-pictogram blijft zichtbaar zolang het menubalkpictogram is uitgeschakeld."
 }

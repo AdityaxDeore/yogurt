@@ -673,5 +673,7 @@
   "Clear": "साफ़ करें",
   "Reading {title} {others}…": "{title} {others} पढ़ी जा रही हैं…",
   "Searched {name}": "{name} में खोजा गया",
-  "Searched all meetings": "सभी मीटिंग में खोजा गया"
+  "Searched all meetings": "सभी मीटिंग में खोजा गया",
+  "Show Yogurt in the Dock": "Dock में Yogurt दिखाएँ",
+  "The Dock icon stays visible while the menu bar icon is off.": "मेनू बार आइकन बंद रहने पर Dock आइकन दिखाई देता रहेगा।"
 }

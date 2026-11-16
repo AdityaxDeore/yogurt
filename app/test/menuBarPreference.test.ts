@@ -14,7 +14,7 @@ it('defaults on, persists off across reloads, rejects non-booleans and applies c
   const dir = mkdtempSync(join(tmpdir(), 'yogurt-menu-pref-')); dirs.push(dir)
   const file = join(dir, 'settings.json')
   const setTrayVisible = vi.fn()
-  const deps = { file, permissions: {} as Parameters<typeof hookPreferences>[0]['permissions'], ask: false, setLogin: vi.fn(), loginOn: () => false, macName: () => 'Dana', relaunch: () => false, setTrayVisible }
+  const deps = { file, permissions: {} as Parameters<typeof hookPreferences>[0]['permissions'], ask: false, setLogin: vi.fn(), loginOn: () => false, macName: () => 'Dana', relaunch: () => false, setTrayVisible, setDockVisible: vi.fn() }
   hookPreferences(deps)
   const get = () => handlers.get('settings:get')!()
   const set = (value: unknown) => handlers.get('settings:menu-bar')!(null, value)
@@ -37,7 +37,7 @@ it('defaults on, persists off across reloads, rejects non-booleans and applies c
 it('keeps recordings by default and persists only a valid retention preference', () => {
   const dir = mkdtempSync(join(tmpdir(), 'yogurt-audio-pref-')); dirs.push(dir)
   const file = join(dir, 'settings.json')
-  const deps = { file, permissions: {} as Parameters<typeof hookPreferences>[0]['permissions'], ask: false, setLogin: vi.fn(), loginOn: () => false, macName: () => 'Dana', relaunch: () => false, setTrayVisible: vi.fn() }
+  const deps = { file, permissions: {} as Parameters<typeof hookPreferences>[0]['permissions'], ask: false, setLogin: vi.fn(), loginOn: () => false, macName: () => 'Dana', relaunch: () => false, setTrayVisible: vi.fn(), setDockVisible: vi.fn() }
   hookPreferences(deps)
   const get = () => handlers.get('settings:get')!().keepRecordings
   const set = (on: unknown) => handlers.get('settings:keep-recordings')!(null, on)

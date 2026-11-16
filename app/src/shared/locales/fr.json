@@ -701,5 +701,7 @@
   "Clear": "Effacer",
   "Reading {title} {others}…": "Lecture de « {title} » {others}…",
   "Searched {name}": "Recherche dans {name}",
-  "Searched all meetings": "Recherche dans toutes les réunions"
+  "Searched all meetings": "Recherche dans toutes les réunions",
+  "Show Yogurt in the Dock": "Afficher Yogurt dans le Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "L’icône du Dock reste visible tant que l’icône de la barre des menus est désactivée."
 }

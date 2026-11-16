@@ -695,5 +695,7 @@
   "Clear": "נקה",
   "Reading {title} {others}…": "קורא את {title} {others}…",
   "Searched {name}": "בוצע חיפוש ב־{name}",
-  "Searched all meetings": "בוצע חיפוש בכל הפגישות"
+  "Searched all meetings": "בוצע חיפוש בכל הפגישות",
+  "Show Yogurt in the Dock": "הצגת Yogurt ב-Dock",
+  "The Dock icon stays visible while the menu bar icon is off.": "סמל ה-Dock נשאר גלוי כל עוד סמל שורת התפריטים כבוי."
 }

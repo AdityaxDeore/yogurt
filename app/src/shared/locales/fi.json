@@ -691,5 +691,7 @@
   "Clear": "Tyhjennä",
   "Reading {title} {others}…": "Luetaan {title} {others}…",
   "Searched {name}": "Haettu kohteesta {name}",
-  "Searched all meetings": "Haettu kaikista kokouksista"
+  "Searched all meetings": "Haettu kaikista kokouksista",
+  "Show Yogurt in the Dock": "Näytä Yogurt Dockissa",
+  "The Dock icon stays visible while the menu bar icon is off.": "Dock-kuvake pysyy näkyvissä, kun valikkorivikuvake on pois päältä."
 }

@@ -643,5 +643,7 @@
   "Clear": "지우기",
   "Reading {title} {others}…": "‘{title}’ {others} 읽는 중…",
   "Searched {name}": "{name}에서 검색함",
-  "Searched all meetings": "모든 회의에서 검색함"
+  "Searched all meetings": "모든 회의에서 검색함",
+  "Show Yogurt in the Dock": "Dock에 Yogurt 표시",
+  "The Dock icon stays visible while the menu bar icon is off.": "메뉴 막대 아이콘이 꺼져 있는 동안 Dock 아이콘은 계속 표시됩니다."
 }
