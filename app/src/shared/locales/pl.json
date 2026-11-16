@@ -721,5 +721,10 @@
   "Clear": "Wyczyść",
   "Reading {title} {others}…": "Czytanie spotkań „{title}” {others}…",
   "Searched {name}": "Przeszukano {name}",
-  "Searched all meetings": "Przeszukano wszystkie spotkania"
+  "Searched all meetings": "Przeszukano wszystkie spotkania",
+  "Notes & AI": "Notatki i AI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Podsumowania i pytania korzystają z modelu notatek pobranego na ten komputer.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Tylko transkrypcja. Nie pobiera się żaden model notatek ani nie powstają podsumowania czy odpowiedzi. Transkrypcje i wyszukiwanie działają dalej. Wyłączenie pobierze model notatek.",
+  "Summaries are off — Transcription only mode is on.": "Podsumowania są wyłączone — tryb Tylko transkrypcja jest włączony.",
+  "Ask is off in Transcription only mode.": "Pytania są wyłączone w trybie Tylko transkrypcja."
 }

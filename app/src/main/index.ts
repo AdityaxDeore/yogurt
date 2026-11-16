@@ -167,6 +167,7 @@ function createSetup(): SetupController {
       load: () => loadSettings(join(userDataDir(), 'settings.json')).notesUpgradeSkipped === true,
       save: (skipped) => { updateSettings(join(userDataDir(), 'settings.json'), { notesUpgradeSkipped: skipped }) },
     },
+    transcriptionOnly: () => loadSettings(join(userDataDir(), 'settings.json')).transcriptionOnly === true,
     // Windows and Linux: the notes engine checks the graphics first (a Mac shares its memory with them, no check)
     getHardware: isFake() ? () => fakeHardware(platform) : async () => toHardware(await readSysInfo(userDataDir()), process.platform === 'darwin' ? undefined : await probeGpu()),
     // the one in this build: new models come with app updates
@@ -485,6 +486,8 @@ app.whenReady().then(() => {
     },
     slowStartMs: isFake() ? Number(process.env.YOGURT_FAKE_BOOT_MS ?? 0) : 0,
     onSpoken: () => spokenChanged(),
+    // Notes & AI flipped in Settings: off resolves waiting LLM jobs and clears their waiting state, on resumes the notes-model download
+    onTranscriptionOnly: (on) => { if (on) { queue.transcriptionOnlyChanged(); notes.transcriptionOnlyChanged() } else setup.resumeNotesDownload() },
   })
   // Music and Spotify pause while a meeting records, and play again after
   const media = createMedia({ helper: runHelper })
@@ -574,7 +577,7 @@ app.whenReady().then(() => {
   // first run: the notes model lands after recording already works; jobs wait in the queue for it
   // the embedding model (meaning search across meetings) runs in the same worker and is let go with the notes model
   const embedder = createEmbedder({ engine, modelPath: () => setup.installed()?.embed, id: bundledCatalog.embedding.id, dims: bundledCatalog.embedding.dims })
-  const queue = createQueue({ recording: () => !!activeMeeting(), smallMac, backlogMs: transcriptionBacklogMs, onIdle: () => { void model.unload().catch(e => console.error('letting the notes model go failed', e)); void embedder.unload() }, modelReady: () => !!setup.notesPath() })
+  const queue = createQueue({ recording: () => !!activeMeeting(), smallMac, backlogMs: transcriptionBacklogMs, onIdle: () => { void model.unload().catch(e => console.error('letting the notes model go failed', e)); void embedder.unload() }, modelReady: () => !!setup.notesPath(), isTranscriptionOnly: () => loadSettings(settingsFile).transcriptionOnly === true })
   ipcMain.handle('setup:remove-upgrade', () => setup.removeUpgrade(remove => queue.enqueue(async () => {
     await model.unload()
     remove()
@@ -606,6 +609,7 @@ app.whenReady().then(() => {
     // Windows and Linux: a note waiting while the model loads says so (a Mac shows what it always did)
     showLoading: platform !== 'darwin',
     store, queue, model, language: meetingLanguage, onStop: onMeetingStopSaved, named: (id) => callNames.finished(id), earlier: (id) => readAhead.parts(id), me,
+    isTranscriptionOnly: () => loadSettings(settingsFile).transcriptionOnly === true,
     transcribed: async (id) => { await recordingFinished(id); await transcriptFinished(id) },
     send: (v) => win?.webContents.send('notes:changed', v),
     // the notes are written: the meeting goes into the library for chat across meetings
@@ -653,6 +657,7 @@ app.whenReady().then(() => {
       if (v.chips.length === 1 && v.chips[0].kind === 'meeting') win?.webContents.send('chat:changed', { ...v, meetingId: v.chips[0].id })
     }, sendList: (l) => win?.webContents.send('conversations:list', l),
     waitsForMeeting: () => smallMac && !!activeMeeting(), waitsForModel: () => !setup.notesPath(),
+    isTranscriptionOnly: () => loadSettings(settingsFile).transcriptionOnly === true,
     // a meeting read in ahead during a recording only where reading ahead is allowed (32 GB and up; the fake Mac is big)
     warmAllowed: () => !activeMeeting() || (isFake() ? !smallMac : readAheadAllowed(os.totalmem())),
   })
@@ -734,7 +739,7 @@ app.whenReady().then(() => {
   ipcMain.handle('notes:set-enhanced', (_e, id: unknown, md: unknown, revision: unknown) => saveEdit(id, 'enhanced', md, revision))
   ipcMain.on('notes:flush-sync', (e, id: unknown, side: unknown, md: unknown, revision: unknown) => { e.returnValue = saveEdit(id, side, md, revision) })
   ipcMain.on('notes:kept-edits', (_e, id: unknown) => { if (known(id)) notes.keptEdits(id) })
-  ipcMain.handle('notes:write-again', (_e, id: unknown) => { if (known(id)) void notes.writeAgain(id) })
+  ipcMain.handle('notes:write-again', (_e, id: unknown) => { if (known(id) && !loadSettings(settingsFile).transcriptionOnly) void notes.writeAgain(id) })
   app.on('will-quit', () => engine.dispose())
   // an earlier quit or crash may have left parts unjoined: try again now
   const rejoined = rejoinInterrupted(join(userDataDir(), 'meetings'), async dir => {
@@ -745,7 +750,7 @@ app.whenReady().then(() => {
   // meetings whose notes a quit or crash cut short: caught up once the models are ready, one at a time
   let caughtUp = false
   // and meetings not in the library yet (or changed since) are indexed, once nothing else is waiting
-  const catchUp = () => { if (!caughtUp && setup.state.phase === 'ready') { caughtUp = true; void rejoined.catch(e => console.warn('audio startup repair retained its files', e)).finally(() => { notes.recover(); folderSuggestions.refresh(); void indexer.schedule() }) } }
+  const catchUp = () => { if (!caughtUp && setup.state.phase === 'ready') { caughtUp = true; void rejoined.catch(e => console.warn('audio startup repair retained its files', e)).finally(() => { if (!loadSettings(settingsFile).transcriptionOnly) { notes.recover(); folderSuggestions.refresh() } void indexer.schedule() }) } }
   setup.onState(catchUp)
   // meetings recorded before the speech model was in (#30): transcribed from their saved recording once it is, one at
   // a time and never while recording (a new recording pauses it; it carries on after)
@@ -769,8 +774,8 @@ app.whenReady().then(() => {
         console.info('ASR', `transcribing ${m.id} from its recording: it was recorded before the speech model was in`)
         const done = await transcribeRecorded(m.id, tracks, () => !!activeMeeting())
         win?.webContents.send('meetings:changed'); win?.webContents.send('transcript:speakers', m.id)
-        // notes that came out empty (no transcript then) are written now
-        if (done && !store.notes(m.id).enhanced?.trim()) void notes.writeAgain(m.id)
+        // notes that came out empty (no transcript then) are written now — never in transcription-only mode
+        if (done && !loadSettings(settingsFile).transcriptionOnly && !store.notes(m.id).enhanced?.trim()) void notes.writeAgain(m.id)
       }
     } catch (e) { console.error('transcribing waiting meetings failed', e) } finally { backfilling = false }
   }

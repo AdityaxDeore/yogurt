@@ -673,5 +673,10 @@
   "Clear": "Temizle",
   "Reading {title} {others}…": "“{title}” {others} okunuyor…",
   "Searched {name}": "{name} içinde arandı",
-  "Searched all meetings": "Tüm toplantılarda arandı"
+  "Searched all meetings": "Tüm toplantılarda arandı",
+  "Notes & AI": "Notlar ve YZ",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Özetler ve Sorular, bu bilgisayara indirilen bir not modelini kullanır.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Yalnızca transkripsiyon. Hiçbir not modeli indirilmez, özet veya yanıt oluşturulmaz. Transkriptler ve arama çalışmaya devam eder. Kapatmak not modelini indirir.",
+  "Summaries are off — Transcription only mode is on.": "Özetler kapalı — Yalnızca transkripsiyon modu açık.",
+  "Ask is off in Transcription only mode.": "Sorular, Yalnızca transkripsiyon modunda kapalıdır."
 }

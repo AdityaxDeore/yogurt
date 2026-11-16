@@ -685,5 +685,10 @@
   "Clear": "Tøm",
   "Reading {title} {others}…": "Leser {title} {others}…",
   "Searched {name}": "Søkte i {name}",
-  "Searched all meetings": "Søkte i alle møter"
+  "Searched all meetings": "Søkte i alle møter",
+  "Notes & AI": "Notater og KI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Sammendrag og Spør bruker en notatmodell som lastes ned til denne datamaskinen.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Kun transkripsjon. Ingen notatmodell lastes ned, og det lages ingen sammendrag eller svar. Transkripsjoner og søk fungerer fortsatt. Å slå det av laster ned notatmodellen.",
+  "Summaries are off — Transcription only mode is on.": "Sammendrag er av — modusen Kun transkripsjon er på.",
+  "Ask is off in Transcription only mode.": "Spør er av i modusen Kun transkripsjon."
 }

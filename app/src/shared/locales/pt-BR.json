@@ -701,5 +701,10 @@
   "Clear": "Limpar",
   "Reading {title} {others}…": "Lendo {title} {others}…",
   "Searched {name}": "Pesquisa em {name}",
-  "Searched all meetings": "Pesquisa em todas as reuniões"
+  "Searched all meetings": "Pesquisa em todas as reuniões",
+  "Notes & AI": "Notas e IA",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Resumos e perguntas usam um modelo de notas baixado neste computador.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Somente transcrição. Nenhum modelo de notas é baixado e nenhum resumo ou resposta é criado. Transcrições e pesquisa continuam funcionando. Desativar baixa o modelo de notas.",
+  "Summaries are off — Transcription only mode is on.": "Os resumos estão desativados — o modo Somente transcrição está ativado.",
+  "Ask is off in Transcription only mode.": "As perguntas estão desativadas no modo Somente transcrição."
 }

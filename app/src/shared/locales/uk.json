@@ -713,5 +713,10 @@
   "Clear": "Очистити",
   "Reading {title} {others}…": "Читаємо «{title}» {others}…",
   "Searched {name}": "Пошук у {name}",
-  "Searched all meetings": "Пошук у всіх зустрічах"
+  "Searched all meetings": "Пошук у всіх зустрічах",
+  "Notes & AI": "Нотатки та ШІ",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Підсумки та запитання використовують модель нотаток, завантажену на цей комп’ютер.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Лише транскрипція. Модель нотаток не завантажується, підсумки й відповіді не створюються. Транскрипції та пошук продовжують працювати. Вимкнення завантажить модель нотаток.",
+  "Summaries are off — Transcription only mode is on.": "Підсумки вимкнено — режим «Лише транскрипція» увімкнено.",
+  "Ask is off in Transcription only mode.": "Запитання вимкнено в режимі «Лише транскрипція»."
 }

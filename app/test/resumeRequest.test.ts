@@ -53,6 +53,7 @@ beforeEach(() => {
     meetings: { get: async () => meeting, onChange: (cb: typeof meetingChanged) => { meetingChanged = cb; return vi.fn() }, resume, stop: vi.fn() },
     notes: { get: async () => notes, onChange: (cb: typeof notesChanged) => { notesChanged = cb; return vi.fn() } },
     widget: { state: async () => null, onState: () => vi.fn() },
+    settings: { get: async () => ({ transcriptionOnly: false }) },
   } })
 })
 afterEach(() => { unmount(); vi.unstubAllGlobals() })

@@ -226,6 +226,7 @@ const api: YogurtApi = {
     get: () => ipcRenderer.invoke('settings:get'),
     setTheme: (v) => ipcRenderer.invoke('settings:theme', v),
     setShowInMenuBar: (on) => ipcRenderer.invoke('settings:menu-bar', on),
+    setTranscriptionOnly: (on) => ipcRenderer.invoke('settings:transcription-only', on),
     setOpenAtLogin: (on) => ipcRenderer.invoke('settings:login', on),
     setName: (name) => ipcRenderer.invoke('settings:name', name),
     setStopWhenCallEnds: (on) => ipcRenderer.invoke('settings:auto-stop', on),

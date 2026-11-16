@@ -643,5 +643,10 @@
   "Clear": "ล้าง",
   "Reading {title} {others}…": "กำลังอ่าน {title} {others}…",
   "Searched {name}": "ค้นหาใน {name} แล้ว",
-  "Searched all meetings": "ค้นหาในการประชุมทั้งหมดแล้ว"
+  "Searched all meetings": "ค้นหาในการประชุมทั้งหมดแล้ว",
+  "Notes & AI": "โน้ตและ AI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "สรุปและถามใช้โมเดลโน้ตที่ดาวน์โหลดลงคอมพิวเตอร์เครื่องนี้",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "ถอดเสียงเท่านั้น ไม่มีการดาวน์โหลดโมเดลโน้ต และไม่มีการสร้างสรุปหรือคำตอบ การถอดเสียงและการค้นหายังคงใช้งานได้ การปิดจะดาวน์โหลดโมเดลโน้ต",
+  "Summaries are off — Transcription only mode is on.": "สรุปถูกปิด — เปิดโหมดถอดเสียงเท่านั้นอยู่",
+  "Ask is off in Transcription only mode.": "ถามถูกปิดในโหมดถอดเสียงเท่านั้น"
 }

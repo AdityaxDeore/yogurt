@@ -716,5 +716,10 @@
   "Clear": "Vymazat",
   "Reading {title} {others}…": "Čtení {title} {others}…",
   "Searched {name}": "Prohledáno {name}",
-  "Searched all meetings": "Prohledány všechny schůzky"
+  "Searched all meetings": "Prohledány všechny schůzky",
+  "Notes & AI": "Poznámky a AI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Souhrny a dotazy používají model poznámek stažený do tohoto počítače.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Pouze přepis. Žádný model poznámek se nestahuje a nevytvářejí se žádné souhrny ani odpovědi na dotazy. Přepisy a hledání fungují dál. Vypnutí stáhne model poznámek.",
+  "Summaries are off — Transcription only mode is on.": "Souhrny jsou vypnuté — režim Pouze přepis je zapnutý.",
+  "Ask is off in Transcription only mode.": "Dotazy jsou v režimu Pouze přepis vypnuté."
 }

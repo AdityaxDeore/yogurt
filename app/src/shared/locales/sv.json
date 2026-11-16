@@ -685,5 +685,10 @@
   "Clear": "Rensa",
   "Reading {title} {others}…": "Läser {title} {others}…",
   "Searched {name}": "Sökte i {name}",
-  "Searched all meetings": "Sökte i alla möten"
+  "Searched all meetings": "Sökte i alla möten",
+  "Notes & AI": "Anteckningar och AI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Sammanfattningar och Frågor använder en anteckningsmodell som laddas ned till den här datorn.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Endast transkribering. Ingen anteckningsmodell laddas ned och inga sammanfattningar eller svar skapas. Transkriberingar och sökning fungerar fortfarande. Att stänga av det laddar ned anteckningsmodellen.",
+  "Summaries are off — Transcription only mode is on.": "Sammanfattningar är av — läget Endast transkribering är på.",
+  "Ask is off in Transcription only mode.": "Frågor är av i läget Endast transkribering."
 }

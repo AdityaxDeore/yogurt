@@ -685,5 +685,10 @@
   "Clear": "Wissen",
   "Reading {title} {others}…": "{title} {others} lezen…",
   "Searched {name}": "Gezocht in {name}",
-  "Searched all meetings": "Gezocht in alle vergaderingen"
+  "Searched all meetings": "Gezocht in alle vergaderingen",
+  "Notes & AI": "Notities en AI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Samenvattingen en Vragen gebruiken een notitiemodel dat naar deze computer wordt gedownload.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Alleen transcriptie. Er wordt geen notitiemodel gedownload en er worden geen samenvattingen of antwoorden gemaakt. Transcripties en zoeken blijven werken. Uitschakelen downloadt het notitiemodel.",
+  "Summaries are off — Transcription only mode is on.": "Samenvattingen staan uit — de modus Alleen transcriptie staat aan.",
+  "Ask is off in Transcription only mode.": "Vragen staat uit in de modus Alleen transcriptie."
 }

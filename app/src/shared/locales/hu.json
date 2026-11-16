@@ -673,5 +673,10 @@
   "Clear": "Törlés",
   "Reading {title} {others}…": "„{title}” {others} olvasása…",
   "Searched {name}": "{name} átvizsgálva",
-  "Searched all meetings": "Összes megbeszélés átvizsgálva"
+  "Searched all meetings": "Összes megbeszélés átvizsgálva",
+  "Notes & AI": "Jegyzetek és MI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Az összefoglalók és a kérdezés egy erre a számítógépre letöltött jegyzetmodellt használnak.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Csak átírás. Nem töltődik le jegyzetmodell, és nem készülnek összefoglalók vagy válaszok. Az átiratok és a keresés továbbra is működik. Kikapcsoláskor letöltődik a jegyzetmodell.",
+  "Summaries are off — Transcription only mode is on.": "Az összefoglalók ki vannak kapcsolva — a Csak átírás mód be van kapcsolva.",
+  "Ask is off in Transcription only mode.": "A kérdezés ki van kapcsolva Csak átírás módban."
 }

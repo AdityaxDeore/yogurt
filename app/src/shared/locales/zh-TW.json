@@ -643,5 +643,10 @@
   "Clear": "清除",
   "Reading {title} {others}…": "正在讀取「{title}」{others}…",
   "Searched {name}": "已搜尋{name}",
-  "Searched all meetings": "已搜尋所有會議"
+  "Searched all meetings": "已搜尋所有會議",
+  "Notes & AI": "筆記與 AI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "摘要和提問使用下載到這台電腦的筆記模型。",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "僅轉錄。不下載筆記模型，也不產生摘要或回答。轉錄和搜尋繼續可用。關閉後將下載筆記模型。",
+  "Summaries are off — Transcription only mode is on.": "摘要已關閉 — 僅轉錄模式已開啟。",
+  "Ask is off in Transcription only mode.": "在僅轉錄模式下，提問已關閉。"
 }

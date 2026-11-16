@@ -17,6 +17,8 @@ const isKind = (k: unknown): k is PermissionKind => PERMISSION_KINDS.includes(k 
 export function hookPreferences(d: { file: string; permissions: Permissions; ask: boolean; setLogin(on: boolean): void; setTrayVisible(on: boolean): void; loginOn(saved: boolean | undefined): boolean; /** the Mac's full name */ macName(): string
   /** quit and open again, for a permission the Mac applies only then; false when it can't now (recording) */
   relaunch(): boolean
+  /** Notes & AI was flipped: on turns the notes model off (resolve waiting LLM jobs), off resumes its download */
+  onTranscriptionOnly?: (on: boolean) => void
   /** fake mode: a slow start, so tests see the launch screen */
   slowStartMs?: number
   /** the spoken language changed: the meeting being recorded follows it where it can */
@@ -49,7 +51,7 @@ export function hookPreferences(d: { file: string; permissions: Permissions; ask
     // what the Mac says, so a change in System Settings shows here
     // locale: every window (main, card, widget) shows the interface language
     // language: the one picked ('' is the Mac's); locale: the one in use; systemLocale: the Mac's, for the picker
-    return { theme: s.theme ?? 'system', openAtLogin: d.loginOn(s.openAtLogin), showInMenuBar: s.showInMenuBar !== false, language: isLocale(s.language) ? s.language : '', locale: localeOf(s, systemLocale()), systemLocale: systemLocale(), myName: s.myName?.trim() || d.macName(), macName: d.macName(), stopWhenCallEnds: stopsWhenCallEnds(s), recordingReminder: recordingReminderOn(s), keepRecordings: s.keepRecordings !== false, jargon: cleanJargon(s.jargon), spoken: spokenSetting(s) }
+    return { theme: s.theme ?? 'system', openAtLogin: d.loginOn(s.openAtLogin), showInMenuBar: s.showInMenuBar !== false, language: isLocale(s.language) ? s.language : '', locale: localeOf(s, systemLocale()), systemLocale: systemLocale(), myName: s.myName?.trim() || d.macName(), macName: d.macName(), stopWhenCallEnds: stopsWhenCallEnds(s), recordingReminder: recordingReminderOn(s), keepRecordings: s.keepRecordings !== false, transcriptionOnly: s.transcriptionOnly === true, jargon: cleanJargon(s.jargon), spoken: spokenSetting(s) }
   })
   // what the person is called in meetings (who "You" is when naming voices); blank: the Mac's full name again
   ipcMain.handle('settings:name', (_e, v: unknown) => {
@@ -101,6 +103,12 @@ export function hookPreferences(d: { file: string; permissions: Permissions; ask
     if (typeof on !== 'boolean') return
     updateSettings(d.file, { showInMenuBar: on ? undefined : false })
     d.setTrayVisible(on)
+  })
+  // Notes & AI off (transcription only) is the non-default, so only on is written down; off removes the key
+  ipcMain.handle('settings:transcription-only', (_e, on: unknown) => {
+    if (typeof on !== 'boolean') return
+    updateSettings(d.file, { transcriptionOnly: on ? true : undefined })
+    d.onTranscriptionOnly?.(on)
   })
   ipcMain.handle('settings:login', (_e, on: unknown) => {
     const yes = on === true

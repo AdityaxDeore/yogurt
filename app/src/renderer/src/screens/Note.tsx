@@ -83,6 +83,8 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource, onResu
   const [pausing, setPausing] = useState(false)
   const [pauseFailed, setPauseFailed] = useState<'pause' | 'resume' | null>(null)
   const [notes, setNotes] = useState<NoteView>()
+  const [transcriptionOnly, setTranscriptionOnly] = useState(false)
+  useEffect(() => { void window.yogurt.settings.get().then((s) => setTranscriptionOnly(s.transcriptionOnly)).catch(() => {}) }, [])
   const [viewState, setView] = useState<'mine' | 'enhanced'>(() => readingViews.get(id)?.view ?? 'mine')
   const [finishRequested, requestFinish] = useState(false)
   const reducedMotion = useReducedMotion()
@@ -382,11 +384,18 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource, onResu
               onClick={(e) => pickTab('notes', 'enhanced', e.detail > 0)}>
               <Sparkles size={14} strokeWidth={1.75} aria-hidden="true" />{t('Summary')}
             </button>}
+            {transcriptionOnly && !hasEnhanced && <button id="note-summary-tab" data-testid="note-summary-tab" role="tab" aria-selected={false} aria-disabled="true" disabled tabIndex={-1}>
+              <Sparkles size={14} strokeWidth={1.75} aria-hidden="true" />{t('Summary')}
+            </button>}
             </div>
             {primary === 'transcript' && <div ref={setTranscriptToolbar} className="note-primary-tools" />}
             <span data-testid="note-tab-indicator" className="note-tab-indicator" aria-hidden="true" />
             {hasEnhanced && primary === 'notes' && <SummaryActions menuButton={rewriteButton} hasSummary={notes.enhanced != null} canWriteAgain={notes.status === 'done' || notes.status === 'failed' || notes.status === 'empty'} onWriteAgain={() => { pick('enhanced'); writeAgain() }} />}
           </div>
+          {transcriptionOnly && primary === 'notes' && <p data-testid="note-summary-off" className="mt-2 text-[13px] leading-relaxed text-muted">
+            {t('Summaries are off — Transcription only mode is on.')}{' '}
+            <button className="ghost-btn" onClick={() => window.yogurt.nav.go('/settings/notes-ai')}>{t('Settings')}</button>
+          </p>}
         </header>
         <div ref={setChatAnchor} className="note-reading-area">
           <div ref={panels} className="note-panels">

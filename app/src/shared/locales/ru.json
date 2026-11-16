@@ -713,5 +713,10 @@
   "Clear": "Очистить",
   "Reading {title} {others}…": "Читаем «{title}» {others}…",
   "Searched {name}": "Поиск в {name}",
-  "Searched all meetings": "Поиск по всем встречам"
+  "Searched all meetings": "Поиск по всем встречам",
+  "Notes & AI": "Заметки и ИИ",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Сводки и вопросы используют модель заметок, загруженную на этот компьютер.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Только транскрипция. Модель заметок не загружается, сводки и ответы не создаются. Транскрипции и поиск продолжают работать. Отключение загрузит модель заметок.",
+  "Summaries are off — Transcription only mode is on.": "Сводки отключены — режим «Только транскрипция» включён.",
+  "Ask is off in Transcription only mode.": "Вопросы отключены в режиме «Только транскрипция»."
 }

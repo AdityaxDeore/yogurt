@@ -43,6 +43,8 @@ export function hookNotes(p: {
   peopleRewriteMs?: number
   /** the person's own name, so the invite's other person is known */
   me?: () => string
+  /** Notes & AI off (transcription only): no notes job is queued and no meeting is marked as waiting for one */
+  isTranscriptionOnly?: () => boolean
 }) {
   const resuming = new Map<string, object>()
   const live = new Map<string, { status: NoteStatus; draft: string; part?: { part: number; of: number }; step?: 'loading' }>()
@@ -218,6 +220,8 @@ export function hookNotes(p: {
   }
 
   const queueWrite = (id: string) => {
+    // transcription only: no notes job, and the meeting is never marked as waiting for one
+    if (p.isTranscriptionOnly?.()) return Promise.resolve()
     console.info('NOTES', `queued the notes of ${id}`)
     set(id, 'waiting')
     return p.queue.enqueue((signal) => write(id, signal), 'enhance', id).catch(() => {})
@@ -226,7 +230,7 @@ export function hookNotes(p: {
   /** each meeting's notes after it stopped, until they are written */
   const afterStop = new Map<string, Promise<void>>()
   p.onStop((m) => {
-    set(m.id, 'waiting')
+    if (!p.isTranscriptionOnly?.()) set(m.id, 'waiting')
     const done = (async () => {
       await p.transcribed(m.id)
       // the names from the call are quick; a stuck pass never holds the notes back for long
@@ -299,6 +303,7 @@ export function hookNotes(p: {
     forgetDrafts: (id: string) => { edits.delete(id) },
     /** "Write again": the same job, now (after anything already waiting) */
     writeAgain(id: string) {
+      if (p.isTranscriptionOnly?.()) return Promise.resolve()
       if (resuming.has(id) || p.store.meeting(id)?.state === 'recording') return Promise.resolve()
       if (!retryDrafts(id)) return Promise.resolve()
       const s = live.get(id)?.status
@@ -307,7 +312,13 @@ export function hookNotes(p: {
     },
     /** at launch: meetings a quit or crash left without notes get them now, one at a time */
     recover() {
+      if (p.isTranscriptionOnly?.()) return
       for (const m of p.store.unenhancedMeetings()) if (!live.has(m.id) && !resuming.has(m.id)) void queueWrite(m.id)
+    },
+    /** Notes & AI was just turned off: a meeting waiting for a notes job that will never run stops waiting instead of showing a download wait forever */
+    transcriptionOnlyChanged() {
+      if (!p.isTranscriptionOnly?.()) return
+      for (const [id, entry] of live) if (entry.status === 'waiting') set(id, 'idle')
     },
   }
   return notes

@@ -643,5 +643,10 @@
   "Clear": "Xóa",
   "Reading {title} {others}…": "Đang đọc {title} {others}…",
   "Searched {name}": "Đã tìm trong {name}",
-  "Searched all meetings": "Đã tìm trong tất cả cuộc họp"
+  "Searched all meetings": "Đã tìm trong tất cả cuộc họp",
+  "Notes & AI": "Ghi chú & AI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Tóm tắt và Hỏi dùng mô hình ghi chú được tải xuống máy tính này.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Chỉ phiên âm. Không tải xuống mô hình ghi chú nào và không tạo tóm tắt hay câu trả lời. Bản phiên âm và tìm kiếm vẫn hoạt động. Tắt đi sẽ tải xuống mô hình ghi chú.",
+  "Summaries are off — Transcription only mode is on.": "Tóm tắt đang tắt — chế độ Chỉ phiên âm đang bật.",
+  "Ask is off in Transcription only mode.": "Hỏi đang tắt trong chế độ Chỉ phiên âm."
 }

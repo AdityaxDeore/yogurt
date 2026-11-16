@@ -695,5 +695,10 @@
   "Clear": "נקה",
   "Reading {title} {others}…": "קורא את {title} {others}…",
   "Searched {name}": "בוצע חיפוש ב־{name}",
-  "Searched all meetings": "בוצע חיפוש בכל הפגישות"
+  "Searched all meetings": "בוצע חיפוש בכל הפגישות",
+  "Notes & AI": "הערות ובינה מלאכותית",
+  "Summaries and Ask use a notes model downloaded to this computer.": "תקצירים ושאלות משתמשים במודל הערות שמועבר למחשב הזה.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "תמלול בלבד. לא מועבר מודל הערות, ולא נוצרים תקצירים או תשובות לשאלות. התמלילים והחיפוש ממשיכים לעבוד. כיבוי האפשרות מוריד את מודל ההערות.",
+  "Summaries are off — Transcription only mode is on.": "התקצירים כבויים — מצב תמלול בלבד מופעל.",
+  "Ask is off in Transcription only mode.": "השאלות כבויות במצב תמלול בלבד."
 }

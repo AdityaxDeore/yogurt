@@ -691,5 +691,10 @@
   "Clear": "Tyhjennä",
   "Reading {title} {others}…": "Luetaan {title} {others}…",
   "Searched {name}": "Haettu kohteesta {name}",
-  "Searched all meetings": "Haettu kaikista kokouksista"
+  "Searched all meetings": "Haettu kaikista kokouksista",
+  "Notes & AI": "Muistiinpanot ja tekoäly",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Yhteenvedot ja kysymykset käyttävät muistiinpanomallia, joka ladataan tälle tietokoneelle.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Vain litterointi. Muistiinpanomallia ei ladata, eikä yhteenvetoja tai vastauksia luoda. Litteroinnit ja haku toimivat yhä. Sen poistaminen käytöstä lataa muistiinpanomallin.",
+  "Summaries are off — Transcription only mode is on.": "Yhteenvedot ovat pois päältä — tila Vain litterointi on päällä.",
+  "Ask is off in Transcription only mode.": "Kysymykset ovat pois päältä tilassa Vain litterointi."
 }

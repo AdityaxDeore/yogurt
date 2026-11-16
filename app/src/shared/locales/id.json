@@ -643,5 +643,10 @@
   "Clear": "Hapus",
   "Reading {title} {others}…": "Membaca {title} {others}…",
   "Searched {name}": "Dicari di {name}",
-  "Searched all meetings": "Dicari di semua rapat"
+  "Searched all meetings": "Dicari di semua rapat",
+  "Notes & AI": "Catatan & AI",
+  "Summaries and Ask use a notes model downloaded to this computer.": "Ringkasan dan Tanya menggunakan model catatan yang diunduh ke komputer ini.",
+  "Transcription only. No notes model is downloaded, and no summaries or Ask answers are made. Transcripts and search keep working. Turning it off downloads the notes model.": "Hanya transkripsi. Tidak ada model catatan yang diunduh, dan tidak ada ringkasan atau jawaban Tanya yang dibuat. Transkrip dan pencarian tetap berfungsi. Mematikannya akan mengunduh model catatan.",
+  "Summaries are off — Transcription only mode is on.": "Ringkasan nonaktif — mode Hanya transkripsi aktif.",
+  "Ask is off in Transcription only mode.": "Tanya nonaktif dalam mode Hanya transkripsi."
 }
