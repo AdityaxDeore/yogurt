@@ -82,6 +82,9 @@
 .document-body { padding-inline:clamp(20px,calc(10cqw - 42px),48px); }
 .workspace-toolbar { position:absolute;inset-inline:0;top:0;height:52px;z-index:50;display:flex;align-items:center;padding:0 24px;border-bottom:1px solid var(--line);background:transparent; }
 .workspace-toolbar[data-note=true] { padding-inline-end:185px; }
+/* Match the 30px controls centred above the title bar's bottom hairline. */
+.note-topbar { top:calc((52px - 1px - 30px) / 2); }
+.note-topbar > div > button { width:30px;height:30px; }
 .workspace-breadcrumb { display:flex;gap:9px;align-items:center;min-width:0;color:var(--muted);font-size:13px;white-space:nowrap; }
 .workspace-breadcrumb>svg { flex:none; }
 .workspace-breadcrumb>[aria-current] { color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis; }
@@ -133,6 +136,7 @@
 .workspace:dir(rtl) .workspace-toolbar:has(.workspace-toolbar-actions:not(:empty)) { padding-inline-end:132px; }
 /* Reserve space for the status and More, truncating labels in a narrow window. */
 .workspace-toolbar:has(.notes-download-status) { gap:10px;padding-inline-end:17px; }
+.workspace-toolbar:has(.update-ready-status):has(.notes-download-status:not(.update-ready-status)) { gap:8px; }
 .workspace-toolbar:has(.notes-download-status) .workspace-breadcrumb { flex:1;overflow:hidden; }
 .workspace-toolbar[data-note=true]:has(.notes-download-status) { padding-inline-end:62px; }
 .workspace:dir(rtl) .workspace-toolbar:has(.notes-download-status) { padding-inline-end:132px; }
@@ -208,7 +212,7 @@
 .agenda-week button:not([aria-pressed=true]):not([aria-current=date]):hover b { background:var(--accent-soft); }
 .agenda-week [aria-pressed=true] b { color:var(--accent);background:var(--accent-soft);border-color:transparent; }
 .agenda-week [aria-current=date] b { color:#FFFFFF;background:var(--primary); }
-.agenda-day { display:flex;align-items:baseline;gap:9px;margin-bottom:16px; }
+.agenda-day { display:flex;align-items:baseline;gap:9px;margin-bottom:0; }
 .agenda-day h3 { font-size:13px;font-weight:600; }
 .agenda-day>span { font-size:11px;color:var(--muted); }
 .agenda-events { display:flex;flex-direction:column;gap:3px; }
@@ -265,7 +269,6 @@
   .native-agenda { padding-block:16px; }
   .agenda-navigation { margin-top:12px; }
   .agenda-week { padding-block:10px 12px;margin-bottom:12px; }
-  .agenda-day { margin-bottom:6px; }
 }
 .agenda-event[data-faded=true] :is(.agenda-time,.agenda-title,.agenda-marker) { color:var(--ink);opacity:.65; }
 .agenda-status { font-size:12px;line-height:1.65;color:var(--muted);padding:10px 0; }
@@ -636,7 +639,6 @@ body:has(.chat-panel[open]) .app-toast-viewport:dir(rtl) { --toast-x:440px; }
 /* The scroll viewport meets the tab/footer borders; spacing belongs inside the scrolled content. */
 .note-reading-frame { position:relative;min-width:0;min-height:0;flex:1;margin:0 calc(max(0px,(100% - 860px)/2) + clamp(20px,calc(10cqw - 42px),48px) - 14px);padding:0 2px;border-radius:12px; }
 /* Keep a status lane even at rest, so progress never covers or displaces the summary. */
-.note-reading-frame[data-has-summary=true] { padding-bottom:44px; }
 .note-reading-frame[hidden] { display:none; }
 .note-reading-clip { height:100%;overflow:hidden;border-radius:10px; }
 .main-window .note-reading-clip>.note-notes-pane { height:100%;scrollbar-width:auto;scrollbar-gutter:stable; }
@@ -645,7 +647,6 @@ body:has(.chat-panel[open]) .app-toast-viewport:dir(rtl) { --toast-x:440px; }
 .note-reading-clip>.note-notes-pane::-webkit-scrollbar { width:4px; }
 .note-reading-clip>.note-notes-pane::-webkit-scrollbar-track,.note-reading-clip>.note-notes-pane::-webkit-scrollbar-thumb { background:transparent; }
 .note-reading-clip>.note-notes-pane[data-scrolling]::-webkit-scrollbar-thumb { background:color-mix(in srgb,var(--muted) 45%,transparent);border-radius:3px; }
-.note-summary-status { position:absolute;inset-inline-start:14px;bottom:18px;z-index:1;background:var(--bg);color:var(--muted);font-size:11px;line-height:16px;pointer-events:none; }
 .note-latest { position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:6px;padding:4px 12px;background:var(--float);color:var(--ink);font-size:12px;line-height:16px;box-shadow:var(--shadow); }
 
 .native-library { --meeting-selection-tint:6%; }
@@ -674,3 +675,5 @@ body:has(.chat-panel[open]) .app-toast-viewport:dir(rtl) { --toast-x:440px; }
   .app-toast { filter:none!important; }
   .note-folder-proposal,.meeting-folder-proposal,.note-folder-actions,.meeting-folder-proposal .note-folder-name span:last-child { transition:opacity var(--dur-micro) var(--ease-out); }
 }
+
+.note-reading-frame[data-resetting=true] .note-reading-clip { visibility:hidden; }

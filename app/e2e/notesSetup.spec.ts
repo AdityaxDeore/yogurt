@@ -60,11 +60,15 @@ async function expectQuietLayout(page: Page, upgrading: boolean, failed: boolean
     range.selectNodeContents(line)
     return range.getClientRects().length === 1 && line.scrollWidth <= line.clientWidth
   }))).toBe(true)
-  const line = (await popup.locator('.notes-download-support').boundingBox())!
   if (upgrading || failed) {
-    const actions = (await popup.locator('.notes-download-actions').boundingBox())!
-    if (failed) expect(actions.y).toBeGreaterThanOrEqual(line.y + line.height)
-    else expect(Math.abs(actions.y + actions.height / 2 - line.y - line.height / 2)).toBeLessThan(1)
+    // Both rectangles must come from the same frame while the popover is entering.
+    const gap = () => popup.evaluate((el, stacked) => {
+      const line = el.querySelector('.notes-download-support')!.getBoundingClientRect()
+      const actions = el.querySelector('.notes-download-actions')!.getBoundingClientRect()
+      return stacked ? actions.top - line.bottom : Math.abs(actions.y + actions.height / 2 - line.y - line.height / 2)
+    }, failed)
+    if (failed) await expect.poll(gap).toBeGreaterThanOrEqual(0)
+    else await expect.poll(gap).toBeLessThan(1)
   }
   if (upgrading) await expect(popup.getByTestId('notes-setup-skip')).toHaveCSS('text-decoration-line', 'none')
   await expect(popup.locator('.notes-download-next')).toHaveCount(0)
@@ -215,10 +219,18 @@ test('AI status stays on every workspace page and clears recording and More in n
           const popup = page.getByTestId('notes-setup')
           await expect(popup).toBeVisible()
           const box = (await trigger.boundingBox())!, panel = (await popup.boundingBox())!
+          const width = await page.evaluate(() => innerWidth)
           expect(panel.x).toBeGreaterThanOrEqual(12)
-          expect(panel.x + panel.width).toBeLessThanOrEqual((await page.evaluate(() => innerWidth)) - 12)
+          expect(panel.x + panel.width).toBeLessThanOrEqual(width - 12)
           expect(panel.y).toBeGreaterThanOrEqual(box.y + box.height + 8)
-          expect(locale === 'ar' ? panel.x - box.x : panel.x + panel.width - box.x - box.width).toBeCloseTo(0, 0)
+          const end = locale === 'ar' ? box.x : box.x + box.width - panel.width
+          const start = locale === 'ar' ? box.x + box.width - panel.width : box.x
+          // In narrow RTL Trash, Empty Trash and the recorder leave room only for the flipped alignment.
+          // Base UI adds a pixel to collision padding when deciding whether to flip.
+          const fits = (x: number) => x >= 13 && x + panel.width <= width - 13
+          if (fits(end)) expect(Math.abs(panel.x - end)).toBeLessThanOrEqual(0.5)
+          else if (fits(start)) expect(Math.abs(panel.x - start)).toBeLessThanOrEqual(0.5)
+          else expect(Math.min(Math.abs(panel.x - 12), Math.abs(panel.x + panel.width - width + 12))).toBeLessThanOrEqual(1)
           await page.keyboard.press('Escape')
         }
       }
