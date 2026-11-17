@@ -15,7 +15,7 @@ it('transcription only defaults off, persists on across reloads, rejects non-boo
   const dir = mkdtempSync(join(tmpdir(), 'yogurt-transcription-pref-')); dirs.push(dir)
   const file = join(dir, 'settings.json')
   const onTranscriptionOnly = vi.fn()
-  const deps = { file, permissions: {} as Parameters<typeof hookPreferences>[0]['permissions'], ask: false, setLogin: vi.fn(), loginOn: () => false, macName: () => 'Dana', relaunch: () => false, setTrayVisible: vi.fn(), onTranscriptionOnly }
+  const deps = { file, permissions: {} as Parameters<typeof hookPreferences>[0]['permissions'], ask: false, setLogin: vi.fn(), loginOn: () => false, macName: () => 'Dana', relaunch: () => false, setTrayVisible: vi.fn(), setDockVisible: vi.fn(), onTranscriptionOnly }
   hookPreferences(deps)
   const get = () => handlers.get('settings:get')!()
   const set = (value: unknown) => handlers.get('settings:transcription-only')!(null, value)
@@ -36,7 +36,7 @@ it('transcription only defaults off, persists on across reloads, rejects non-boo
 it('a corrupt transcription value falls back to normal mode', () => {
   const dir = mkdtempSync(join(tmpdir(), 'yogurt-transcription-pref-')); dirs.push(dir)
   const file = join(dir, 'settings.json')
-  const deps = { file, permissions: {} as Parameters<typeof hookPreferences>[0]['permissions'], ask: false, setLogin: vi.fn(), loginOn: () => false, macName: () => 'Dana', relaunch: () => false, setTrayVisible: vi.fn() }
+  const deps = { file, permissions: {} as Parameters<typeof hookPreferences>[0]['permissions'], ask: false, setLogin: vi.fn(), loginOn: () => false, macName: () => 'Dana', relaunch: () => false, setTrayVisible: vi.fn(), setDockVisible: vi.fn() }
   hookPreferences(deps)
   const get = () => handlers.get('settings:get')!()
   writeFileSync(file, JSON.stringify({ transcriptionOnly: 'yes' }))

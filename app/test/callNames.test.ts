@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { EventEmitter } from 'node:events'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -48,7 +48,7 @@ function setup(o: { app?: string | null; attendees?: Meeting['attendees'] } = {}
   const watched: string[][] = []
   let emit!: (l: WatchLine) => void
   let stopped = 0
-  const starts: Array<(m: Meeting) => void> = [], stops: Array<(m: Meeting) => void> = []
+  const starts: Array<(m: Meeting) => void> = [], stops: Array<(m: Meeting) => void> = [], binds: Array<(m: Meeting) => void> = []
   const captures: Array<(c: EventEmitter, id: string) => void> = []
   const changed: string[] = [], logs: string[] = []
   let transcribed!: () => void
@@ -56,7 +56,7 @@ function setup(o: { app?: string | null; attendees?: Meeting['attendees'] } = {}
   const hook = hookCallNames({
     store, myNames: () => ['Alex Morgan'], transcribed: () => done, changed: (id) => changed.push(id), log: (s) => logs.push(s), now: () => clock,
     watch: (ids, onLine) => { watched.push(ids); emit = onLine; return { stop: () => { stopped++ } } },
-    onStart: (fn) => starts.push(fn), onStop: (fn) => stops.push(fn), onCapture: (fn) => captures.push(fn),
+    onStart: (fn) => starts.push(fn), onStop: (fn) => stops.push(fn), onCapture: (fn) => captures.push(fn), onBind: (fn) => binds.push(fn),
   })
   const capture = new EventEmitter()
   return {
@@ -65,6 +65,8 @@ function setup(o: { app?: string | null; attendees?: Meeting['attendees'] } = {}
     /** audio heard: meeting time `ms`, arriving at wall clock `at` */
     audio(ms: number, at: number) { clock = at; capture.emit('pcm', 'them', ms, new Float32Array(1600)) },
     emit: (l: WatchLine) => emit(l),
+    /** the recording learned its call app (CALL bind) */
+    bind(app: string) { binds.forEach((f) => f({ ...store.meeting(m.id)!, app })) },
     stop() { const s = { ...store.meeting(m.id)!, state: 'stopped' as const }; stops.forEach((f) => f(s)) },
   }
 }
@@ -72,10 +74,11 @@ const wait = () => new Promise((r) => setTimeout(r, 10))
 
 describe('watchIds: only the call app the meeting is in', () => {
   it('maps the detected app to its ids (bundle ids on a Mac, program names and Flatpak ids on Linux); no app known: every call app (the first with a call is read)', () => {
-    expect(watchIds('Zoom')).toEqual(['us.zoom.xos', 'zoom', 'us.zoom.Zoom'])
-    expect(watchIds('Teams')).toEqual(['com.microsoft.teams2', 'com.microsoft.teams', 'teams-for-linux', 'com.github.IsmaelMartinez.teams_for_linux'])
+    expect(watchIds('Zoom')).toEqual(['us.zoom.xos', 'zoom', 'us.zoom.Zoom', 'zoom.exe'])
+    expect(watchIds('Teams')).toEqual(['com.microsoft.teams2', 'com.microsoft.teams', 'teams-for-linux', 'com.github.IsmaelMartinez.teams_for_linux', 'ms-teams.exe', 'teams.exe'])
     expect(watchIds('Webex')).toEqual(['Cisco-Systems.Spark', 'com.cisco.webexmeetingsapp'])
-    expect(watchIds('Chrome')).toEqual(['com.google.Chrome', 'chrome', 'google-chrome'])
+    expect(watchIds('Chrome')).toEqual(['com.google.Chrome', 'chrome', 'google-chrome', 'chrome.exe'])
+    expect(watchIds('Edge')).toContain('msedge.exe')
     expect(watchIds('Safari')).toEqual(['com.apple.Safari'])
     expect(watchIds('FaceTime')).toEqual([])
     expect(watchIds(null)).toContain('us.zoom.xos')
@@ -103,6 +106,33 @@ describe('Webex accessibility roster', () => {
 })
 
 describe('hookCallNames', () => {
+  it('a recording started by hand watches every call app until its app is known, then only that one (a Teams chat window cannot hide a Meet call, #72)', () => {
+    const s = setup({ app: null })
+    s.start()
+    expect(s.watched[0]).toContain('com.microsoft.teams2')
+    s.bind('Chrome')
+    expect(s.stopped()).toBe(1)
+    expect(s.watched.at(-1)).toEqual(watchIds('Chrome'))
+    // a meeting that knew its app from the start is never watched again
+    const k = setup()
+    k.start(); k.bind('Chrome')
+    expect(k.watched).toHaveLength(1)
+  })
+
+  it('says what it read in main.log (info, which the log file keeps; console.log never reaches it)', () => {
+    const root = mkdtempSync(join(tmpdir(), 'yogurt-callnames-')); dirs.push(root)
+    const store = openStore(join(root, 'yogurt.db')); stores.push(store)
+    const m = store.createMeeting({ title: 'Sync', startedAt: 1_000_000, endedAt: null, eventId: null, app: 'FaceTime', attendees: [], state: 'recording' })
+    const info = vi.spyOn(console, 'info').mockImplementation(() => {})
+    const starts: Array<(m: Meeting) => void> = []
+    try {
+      hookCallNames({ store, myNames: () => [], transcribed: async () => {}, changed: () => {}, watch: () => ({ stop() {} }),
+        onStart: (fn) => starts.push(fn), onStop: () => {}, onCapture: () => {} })
+      starts.forEach((f) => f(m))
+      expect(info.mock.calls.flat().join('\n')).toContain("call names: FaceTime can't be read")
+    } finally { info.mockRestore() }
+  })
+
   it('a resumed session names only new lines and preserves previous speaker labels', async () => {
     const s = setup()
     s.store.addSegments([{ meetingId: s.m.id, track: 'them', startMs: 1000, endMs: 3000, text: 'Prior session.', speaker: 'Ann Lee' }])
@@ -116,7 +146,7 @@ describe('hookCallNames', () => {
   it('reads the meeting\'s app while it records, and a line of the other side gets the name talking then', () => {
     const s = setup()
     s.start()
-    expect(s.watched).toEqual([['us.zoom.xos', 'zoom', 'us.zoom.Zoom']])
+    expect(s.watched).toEqual([['us.zoom.xos', 'zoom', 'us.zoom.Zoom', 'zoom.exe']])
     // meeting time 0 was heard at 1_005_000 (the 100 ms of audio arrived 100 ms after it started)
     s.audio(0, 1_005_100)
     for (let t = 1_006_000; t < 1_014_000; t += 500) s.emit(zoomLine(t, ['Alex Morgan', 'Dana Smith', 'Ann Lee'], t < 1_010_000 ? 'Dana Smith' : 'Ann Lee'))
@@ -154,6 +184,9 @@ describe('hookCallNames', () => {
     expect(s.changed).toEqual([s.m.id])
     // the first reading is pictured in the log, for a real call's data
     expect(s.logs.some((l) => l.includes('AXTabGroup'))).toBe(true)
+    // main.log is pasted into public issues: no one's name reaches it, only counts and shapes
+    for (const name of ['Alex Morgan', 'Dana Smith', 'Ann Lee']) expect(s.logs.join('\n')).not.toContain(name)
+    expect(s.logs.some((l) => /talking 1 of 3/.test(l))).toBe(true)
   })
 
   it('without Accessibility, or with nothing read, every line stays Them and nothing changes', async () => {

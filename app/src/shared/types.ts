@@ -16,6 +16,7 @@ export type MissingPermission = { kind: PermissionKind; status: Access; essentia
 export type DeleteRecordingResult = 'deleted' | 'missing' | 'recording' | 'not-transcribed' | 'kept' | 'failed'
 
 export type Theme = 'light' | 'dark' | 'system'
+export type AppVisibility = 'both' | 'menu-bar' | 'dock'
 /** The capture has stopped, but its final database state may still need an explicit retry. */
 export type MeetingView = Meeting & { stopSavePending?: true; paused?: true }
 export type MeetingCard = StoredMeetingCard & { paused?: true }
@@ -248,7 +249,7 @@ export type YogurtApi = {
   }
   settings: {
     /** myName: what the person is called in meetings (their Mac's full name, macName, when they never changed it) */
-    get(): Promise<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; /** the language picked; '' follows the Mac */ language: string; /** the language in use */ locale: string; /** the Mac's language, among Yogurt's */ systemLocale: string; myName: string; macName: string; /** a recording stops by itself when its call ends (off: ask first) */ stopWhenCallEnds: boolean; recordingReminder: boolean; keepRecordings: boolean; /** Notes & AI off: run without the notes model */ transcriptionOnly: boolean; /** personal jargon, spelled as typed */ jargon: string[]; /** the language people speak in meetings */ spoken: import('./spoken').Spoken }>
+    get(): Promise<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; appVisibility: AppVisibility; /** the language picked; '' follows the Mac */ language: string; /** the language in use */ locale: string; /** the Mac's language, among Yogurt's */ systemLocale: string; myName: string; macName: string; /** a recording stops by itself when its call ends (off: ask first) */ stopWhenCallEnds: boolean; recordingReminder: boolean; keepRecordings: boolean; /** Notes & AI off: run without the notes model */ transcriptionOnly: boolean; /** personal jargon, spelled as typed */ jargon: string[]; /** the language people speak in meetings */ spoken: import('./spoken').Spoken; /** default summary language; '' follows the meeting */ summaryLanguage: string }>
     /** blank goes back to the Mac's full name */
     setName(name: string): Promise<void>
     setTheme(v: Theme): Promise<void>
@@ -256,6 +257,7 @@ export type YogurtApi = {
     setShowInMenuBar(on: boolean): Promise<void>
     /** Notes & AI off (transcription only): no notes model is downloaded, no notes job runs */
     setTranscriptionOnly(on: boolean): Promise<void>
+    setAppVisibility(choice: AppVisibility): Promise<void>
     setStopWhenCallEnds(on: boolean): Promise<void>
     setRecordingReminder(on: boolean): Promise<void>
     setKeepRecordings(on: boolean): Promise<void>
@@ -263,6 +265,7 @@ export type YogurtApi = {
     setJargon(terms: string[]): Promise<string[]>
     /** the interface language ('' follows the Mac); gives back the one now in use */
     setLanguage(id: string): Promise<string>
+    setSummaryLanguage(id: string): Promise<void>
     /** every window hears the language change, wherever it was picked */
     onLanguage(cb: (locale: string) => void): () => void
     /** English only or Multi-language: the meeting being recorded and the next ones */

@@ -11,6 +11,22 @@ const load = (id: string): Record<string, Entry> => JSON.parse(readFileSync(join
 const blanks = (s: string) => [...new Set(s.match(/\{\w+\}/g) ?? [])].sort()
 const forms = (e: Entry) => (typeof e === 'string' ? [e] : Object.values(e))
 
+it('translates the app location choice and removes the old Mac toggle labels', () => {
+  for (const { id } of LOCALES) {
+    const table = load(id)
+    for (const key of ['Show Yogurt in', 'Menu bar and Dock', 'Menu bar only', 'Dock only']) {
+      expect(keys).toContain(key)
+      expect(table[key]).toBeTypeOf('string')
+      expect(table[key]).not.toBe('')
+      if (id !== 'en') expect(table[key]).not.toBe(key)
+    }
+    for (const key of ['Show Yogurt in the menu bar', 'Show Yogurt in the Dock']) {
+      expect(keys).not.toContain(key)
+      expect(table).not.toHaveProperty(key)
+    }
+  }
+})
+
 it('translates the summary waiting label in every locale', () => {
   const key = 'Reading the transcript…'
   expect(keys).toContain(key)
@@ -242,6 +258,17 @@ it('translates the closest matching meeting and count in every locale', () => {
 
 it('translates the searched scope line in every locale', () => {
   for (const key of ['Searched all meetings', 'Searched {name}']) {
+    expect(keys).toContain(key)
+    for (const { id } of LOCALES) {
+      expect(load(id)[key]).toBeTypeOf('string')
+      expect(load(id)[key]).not.toBe('')
+      if (id !== 'en') expect(load(id)[key]).not.toBe(key)
+    }
+  }
+})
+
+it('translates the summary language setting in every locale', () => {
+  for (const key of ['Summary language', 'Same as the meeting', 'Used for new summaries and when you write them again.']) {
     expect(keys).toContain(key)
     for (const { id } of LOCALES) {
       expect(load(id)[key]).toBeTypeOf('string')

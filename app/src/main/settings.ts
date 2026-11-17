@@ -18,6 +18,8 @@ export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what t
   openAtLogin?: boolean
   /** the native menu bar icon; on unless turned off */
   showInMenuBar?: boolean
+  /** the Dock icon; on unless turned off */
+  showInDock?: boolean
   /** Legacy flag, ignored: it may have come from a different app bundle. Removed after a confirmed post. */
   notificationsAsked?: boolean
   /** Designated requirements of app identities that successfully posted the registering notification. Not authorization. */
@@ -44,11 +46,15 @@ export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what t
   jargon?: string[]
   /** the language people speak in meetings: English only unless 'multi' (shared/spoken.ts) */
   spoken?: Spoken
+  /** the default for newly written summaries; the meeting's language when left out */
+  summaryLanguage?: string
   /** new versions download by themselves; on unless turned off */
   autoUpdate?: boolean }
 
 /** "English only" unless Multi-language was picked */
 export const spokenSetting = (s: Settings): Spoken => spokenOf(s.spoken)
+
+export const summaryLanguageSetting = (s: Settings): string => isLocale(s.summaryLanguage) ? s.summaryLanguage : ''
 
 /** "Finish recording when the call ends": on by default */
 export const stopsWhenCallEnds = (s: Settings): boolean => s.stopWhenCallEnds !== false
@@ -58,6 +64,14 @@ export const keepsRecording = (s: Settings, endedAt: number | null): boolean =>
   s.keepRecordings !== false || typeof s.recordingsOffAt !== 'number' || !Number.isFinite(s.recordingsOffAt) || endedAt == null || endedAt <= s.recordingsOffAt
 
 export const autoUpdateOn = (s: Settings): boolean => s.autoUpdate !== false
+
+/** The Dock icon and the menu bar icon, as the person sees them: at least one stays visible, so the app always has an entry point. */
+export type Visibility = { showInMenuBar: boolean; showInDock: boolean }
+/** A hand-edited file with both icons off restores the Dock. */
+export function visibilityOf(s: Settings): Visibility {
+  const showInMenuBar = s.showInMenuBar !== false
+  return { showInMenuBar, showInDock: !showInMenuBar || s.showInDock !== false }
+}
 
 export function loadSettings(path: string): Settings {
   try { return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : {} } catch { return {} }
