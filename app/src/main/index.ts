@@ -13,7 +13,7 @@ import { isAppRoute } from '../shared/routes'
 import { resumesNote } from '../shared/agendaNote'
 import { relaunchOptions, stripAppImageEnv } from './relaunch'
 import { capabilities, micListHelper, platformOf, supportedKinds } from '../shared/platform'
-import { app, BrowserWindow, dialog, ipcMain, nativeTheme, Notification, protocol, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme, Notification, protocol, safeStorage, shell } from 'electron'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import { basename, join } from 'node:path'
@@ -21,7 +21,7 @@ import { pathToFileURL } from 'node:url'
 import { isFake, userDataDir } from './paths'
 import { logToFile } from './log'
 import { loadSettings, localeOf, keepsRecording, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings, visibilityOf, summaryLanguageSetting } from './settings'
-import { CALL_GONE_MS, useCallApps } from './detect'
+import { CALL_GONE_MS, useCallApps, watchEveryMs } from './detect'
 import { systemLocale } from './locale'
 import { language as uiLanguage, onLanguage, setLanguage, t } from '../shared/i18n'
 import bundledCatalog from '../../../catalog/catalog.json'
@@ -32,7 +32,7 @@ import { realDeps } from './downloader'
 import { wavOf } from './fakeCapture'
 import { askFakeNotifications, chatMeetings, fakeAccess, fakeDownloadDeps, fakeHardware, fakeHelper, fakeNow, installFakeHooks, manyMeetings, mediaCalls, waitForFakeAudioMetadata } from './fake'
 import { createPermissions } from './permissions'
-import { hookPreferences } from './preferences'
+import { hookPreferences, onboardingShowing } from './preferences'
 import { loginItemOn, openedAtLogin, setLoginItem, syncLoginItem } from './loginItem'
 import { createMedia } from './media'
 import { createTray, linuxTrayHost } from './tray'
@@ -40,7 +40,9 @@ import { SetupController } from './setup'
 import { fakeMeasure, measureSpeed, speedClipPath, speedStore } from './asr/speedCheck'
 import { vadModelPath, whisperServerPath } from './asr/server'
 import { openStore, type Store } from './store'
-import { calendars, eventIds, matchesEvent, setCalendarSelection, calendarStatus, createHelperRunner, helperPath, killAllHelpers, refreshCalendarStatus, requestCalendarAccess, runHelper, setCalendarSupported, setHelper, upcoming, type CalEvent } from './calendar'
+import { calendars, eventIds, matchesEvent, setCalendarSelection, setCalendarOwnEmail, calendarStatus, createHelperRunner, helperPath, killAllHelpers, refreshCalendarStatus, requestCalendarAccess, runHelper, setCalendarLinkSource, systemCalendarStatus, setCalendarSupported, setHelper, upcoming, type CalEvent } from './calendar'
+import { createCalendarLinks } from './calendarLink'
+import { getCalendar } from './calendarLink/get'
 import { createSignals } from './detectSignals'
 import { Watcher } from './watch'
 import { createPrompts } from './prompts'
@@ -51,7 +53,7 @@ import { isId, text, rewriteNote } from './ipcArgs'
 import { hookMics } from './mics'
 import { activeCapture, audioHelperPath, hookCapture, joinParts, onCaptureStart, onRecordingEvent, prepareAppend, recordingFinished, recordingPaused, recordingSettled, rejoinInterrupted, setRecordingPaused, settleRecording, tell, type WarnCode } from './capture'
 import { createWidget } from './widget'
-import { hookTranscription, transcribeRecorded, onWhisperGpuOff, meetingLanguage, settleTranscription, speechLocaleFor, spokenChanged, transcriptionBacklogMs, stopTranscriptionServer, transcriptFinished, transcriptPartials } from './asr'
+import { hookTranscription, transcribeRecorded, onWhisperGpuOff, meetingLanguage, settleTranscription, speechLocaleFor, spokenChanged, transcriptionBacklogMs, stopTranscriptionServer, releaseIdleSpeech, transcriptFinished, transcriptPartials } from './asr'
 import { hookCallNames, type Watch } from './callNames'
 import { helperWatch, killAllWatches } from './callNames/watch'
 import { macFullName } from './user'
@@ -64,7 +66,7 @@ import { createNotesModel } from './notes/model'
 import { FakeEngine } from './notes/fake'
 import { hookNotes } from './notes'
 import { hookReadAhead, readAheadAllowed } from './notes/readAhead'
-import { createQueue, isSmallMac } from './notes/queue'
+import { createQueue, isSmallMac, notesMemory } from './notes/queue'
 import type { ContextChip } from '../shared/askContext'
 import { Library } from './library/store'
 import { createEmbedder } from './library/embedder'
@@ -114,7 +116,8 @@ app.on('second-instance', (_e, argv) => { if (app.isReady() && !startedHidden(pr
 
 /** Links open in the user's browser, never inside the app window. */
 function openExternally(url: string) {
-  if (!isFake() && /^https:\/\//.test(url)) void shell.openExternal(url)
+  // fake mode opens nothing (tests), unless a person trying it by hand asks for links (YOGURT_FAKE_OPEN_LINKS=1)
+  if ((!isFake() || process.env.YOGURT_FAKE_OPEN_LINKS === '1') && /^https:\/\//.test(url)) void shell.openExternal(url)
 }
 
 let updateWidgetVisibility = () => {}
@@ -184,7 +187,7 @@ function createSetup(): SetupController {
 /** what the speed check found (Windows and Linux) */
 const speedFile = () => join(userDataDir(), 'speech-speed.json')
 
-/** What this computer can do (fake mode can pretend with YOGURT_FAKE_PLATFORM): Windows and Linux have no calendar or names from calls yet */
+/** What this computer can do (fake mode can pretend with YOGURT_FAKE_PLATFORM): Windows and Linux read their calendar from a calendar link */
 const platform = platformOf(process.platform, process.env)
 const caps = capabilities(platform)
 setCalendarSupported(caps.calendar)
@@ -295,6 +298,8 @@ function startDetection() {
     // the call ended: the same stop as the widget's Stop button, then say so
     autoStop: (m) => { widget.callEnded(m.id); stopMeeting(m.id); prompts.stopped(m) },
     autoStopOn: () => stopsWhenCallEnds(loadSettings(join(userDataDir(), 'settings.json'))),
+    // no "Take notes?" while onboarding is still on screen
+    ready: () => !onboardingShowing(),
     // fake mode: tests can shorten the grace
     graceMs: isFake() && process.env.YOGURT_FAKE_CALL_GONE_MS ? Number(process.env.YOGURT_FAKE_CALL_GONE_MS) : CALL_GONE_MS,
   })
@@ -415,9 +420,11 @@ function startDetection() {
   refreshCalendarConsumers = () => { signals.invalidateCalendar(); void tray.refreshCalendar() }
   setTrayVisible = tray.setVisible
   trayShown = tray.shown
-  // cheap, and only while Yogurt runs
-  const timer = setInterval(() => void watcher.tick().catch((e) => console.error('detect failed', e)), 3000)
-  app.on('will-quit', () => clearInterval(timer))
+  // cheap, and only while Yogurt runs; more often while recording, so a call that ended stops within a few seconds
+  let timer: NodeJS.Timeout | undefined
+  const watchLoop = () => { timer = setTimeout(() => { void watcher.tick().catch((e) => console.error('detect failed', e)).finally(watchLoop) }, watchEveryMs(!!activeMeeting())) }
+  watchLoop()
+  app.on('will-quit', () => clearTimeout(timer))
   if (isFake()) {
     installFakeHooks({
       signals: async (r) => { signals.override(r); await watcher.tick() },
@@ -473,8 +480,19 @@ app.whenReady().then(() => {
   if (isFake()) setHelper(fakeHelper)
   // a moved or reinstalled Yogurt loses its login item: put it back if the person wanted it
   if (!isFake()) syncLoginItem(settings.openAtLogin)
+  // Windows and Linux: the calendar is a pasted private calendar address, kept sealed with the system keychain
+  // a Mac: the same links, next to its own calendars (Settings → Calendars → Add a calendar link)
+  const calendarLinks = caps.calendar ? createCalendarLinks({
+    file: join(userDataDir(), 'settings.json'), get: getCalendar,
+    // no keychain (Linux without a secret service): scrambled, not encrypted, so the address isn't readable at a glance
+    seal: (plain) => (safeStorage.isEncryptionAvailable() ? `k:${safeStorage.encryptString(plain).toString('base64')}` : `b:${Buffer.from(plain).toString('base64')}`),
+    open: (sealed) => (sealed.startsWith('k:') ? safeStorage.decryptString(Buffer.from(sealed.slice(2), 'base64'))
+      : sealed.startsWith('b:') ? Buffer.from(sealed.slice(2), 'base64').toString() : sealed.replace(/^p:/, '')),
+  }) : null
+  if (calendarLinks) setCalendarLinkSource(calendarLinks, { alongside: !caps.calendarLink })
   hookPreferences({
     file: join(userDataDir(), 'settings.json'), permissions, kinds: supportedKinds(caps), os: platform,
+    ...(calendarLinks && caps.calendarLink ? { calendarLinked: () => calendarLinks.status() === 'granted' } : {}),
     // fake mode asks the first-run questions only when a test sets the permissions
     ask: !isFake() || !!process.env.YOGURT_FAKE_PERMISSIONS,
     setLogin: (on) => { if (!isFake()) setLoginItem(on) },
@@ -515,6 +533,10 @@ app.whenReady().then(() => {
   // the person's own names, never given to the other side: the one in Settings and the Mac's
   const settingsFile = join(userDataDir(), 'settings.json')
   setCalendarSelection(() => loadSettings(settingsFile))
+  setCalendarOwnEmail(email => {
+    try { if (store.rememberOwnEmail(email)) win?.webContents.send('meetings:changed') }
+    catch (e) { console.warn('could not save own calendar address', e) }
+  })
   const me = () => loadSettings(settingsFile).myName?.trim() || macName()
   setOwnerName(me)
   setJargon(() => cleanJargon(loadSettings(settingsFile).jargon))
@@ -579,11 +601,12 @@ app.whenReady().then(() => {
   }, (e) => { console.warn("couldn't check the graphics", e); return null })
   // fake mode: the fixed Mac (a bigger one) unless a test asks for a 16 GB one
   const smallMac = isFake() ? process.env.YOGURT_FAKE_SMALL_MAC === '1' : isSmallMac(os.totalmem())
-  const model = createNotesModel({ engine, modelPath: () => setup.notesPath(), onLoaded: path => setup.notesModelLoaded(path) })
+  const memory = notesMemory(smallMac)
+  const model = createNotesModel({ engine, modelPath: () => setup.notesPath(), onLoaded: path => setup.notesModelLoaded(path), contextSize: memory.contextSize, ...(memory.releaseSpeech ? { beforeLoad: releaseIdleSpeech } : {}) })
   // first run: the notes model lands after recording already works; jobs wait in the queue for it
   // the embedding model (meaning search across meetings) runs in the same worker and is let go with the notes model
   const embedder = createEmbedder({ engine, modelPath: () => setup.installed()?.embed, id: bundledCatalog.embedding.id, dims: bundledCatalog.embedding.dims })
-  const queue = createQueue({ recording: () => !!activeMeeting(), smallMac, backlogMs: transcriptionBacklogMs, onIdle: () => { void model.unload().catch(e => console.error('letting the notes model go failed', e)); void embedder.unload() }, modelReady: () => !!setup.notesPath(), isTranscriptionOnly: () => loadSettings(settingsFile).transcriptionOnly === true })
+  const queue = createQueue({ recording: () => !!activeMeeting(), smallMac, idleMs: memory.idleMs, backlogMs: transcriptionBacklogMs, onIdle: () => { void model.unload().catch(e => console.error('letting the notes model go failed', e)); void embedder.unload() }, modelReady: () => !!setup.notesPath(), isTranscriptionOnly: () => loadSettings(settingsFile).transcriptionOnly === true })
   ipcMain.handle('setup:remove-upgrade', () => setup.removeUpgrade(remove => queue.enqueue(async () => {
     await model.unload()
     remove()
@@ -951,7 +974,9 @@ app.whenReady().then(() => {
   })
   const calendarList = async () => {
     const list = await calendars(), settings = loadSettings(settingsFile), hidden = settings.hiddenCalendarIds ?? []
-    return { status: calendarStatus(), hideEventsWithoutCallLink: settings.hideEventsWithoutCallLink === true, calendars: list.map((c) => ({ ...c, enabled: !hidden.includes(c.id) })) }
+    const linkIds = new Set(calendarLinks?.list().map((l) => l.id) ?? [])
+    return { status: calendarStatus(), systemStatus: systemCalendarStatus(), hideEventsWithoutCallLink: settings.hideEventsWithoutCallLink === true,
+      calendars: list.map((c) => ({ ...c, enabled: !hidden.includes(c.id), ...(linkIds.has(c.id) ? { link: true } : {}) })) }
   }
   ipcMain.handle('calendar:list', calendarList)
   ipcMain.handle('calendar:set-enabled', async (_e, id: unknown, enabled: unknown) => {
@@ -985,7 +1010,22 @@ app.whenReady().then(() => {
     return { status: calendarStatus(), events }
   })
   // not asked yet: the Mac's own question; turned off: the Mac's settings, where only the person can turn it on
+  ipcMain.handle('calendar:links', () => calendarLinks?.list() ?? [])
+  ipcMain.handle('calendar:add-link', async (_e, url: unknown) => {
+    if (!calendarLinks || typeof url !== 'string' || url.length > 4096) return { ok: false, error: 'bad-url' }
+    const got = await calendarLinks.add(url)
+    if (got.ok) { await refreshCalendarStatus(); refreshCalendarConsumers(); win?.webContents.send('calendar:changed') }
+    return got
+  })
+  ipcMain.handle('calendar:remove-link', async (_e, id: unknown) => {
+    if (!calendarLinks || typeof id !== 'string') return false
+    calendarLinks.remove(id)
+    await refreshCalendarStatus(); refreshCalendarConsumers(); win?.webContents.send('calendar:changed')
+    return true
+  })
   ipcMain.handle('calendar:connect', async () => {
+    // a calendar link is pasted in Settings' calendars: the same form as the first run's
+    if (calendarLinks && caps.calendarLink) { goTo('/settings'); return refreshCalendarStatus() }
     const was = await refreshCalendarStatus()
     if (was === 'notDetermined') return requestCalendarAccess()
     if (was === 'denied') {
